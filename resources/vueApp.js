@@ -1,4 +1,11 @@
+const app = new Vue({
+    el:'#app',
+    data() {
+        return {
 
+        }
+    },
+    created() {
 /* Set map centered around Oslo */
 var mymap = L.map('mapid').setView([59.91, 10.75], 5);
 
@@ -52,3 +59,6 @@ function onMapClick(e) {
 mymap.on('click', onMapClick);
 
 
+
+    }
+})
