@@ -28,16 +28,17 @@ const coordinates = {
     }
 }
 
-//L.marker(coordinates.Oslo.coordinate).addTo(mymap)
+// Make all markers on map
+const coordKeys = Object.keys(coordinates)
+for (const coordKey of coordKeys) {
+    coordinates[coordKey].marker = L.marker(coordinates[coordKey].coordinate).addTo(mymap);
+    // Add a pop-up to each marker when clicked upon
+    coordinates[coordKey].marker.bindPopup("<b>Weather in " +  coordKey + ":</b>").openPopup();
+    
+}
 
-//const coordKeys = Object.keys(coordinates)
 
-/*for (const coordKey of coordKeys) {
-//    console.log(city.coordinate)
-    L.marker(coordinates.coordKey.coordinate).addTo(mymap);
-}*/
 
-//coordinates.Oslo.marker.bindPopup("<b>Weather in Oslo:<b>.").openPopup();
 
 var popup = L.popup();
 
