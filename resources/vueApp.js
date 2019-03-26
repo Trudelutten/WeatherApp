@@ -1,3 +1,5 @@
+//const parseString = require('xml2js').parseString;
+
 const app = new Vue({
     el:'#app',
 
@@ -6,12 +8,14 @@ const app = new Vue({
             map: null,
             tileLayer: null,
             layers: [],
+            weatherData: null,
         }
     },
 
     mounted() {
         this.initMap();
-        this.initLayers();      
+        this.initLayers();     
+        this.connectForecastAPI(); 
     },
 
     methods: {
@@ -30,7 +34,25 @@ const app = new Vue({
 
             this.tileLayer.addTo(this.map);
         },
+        
         initLayers() {},
+         
+        connectForecastAPI() {
+            let lati = 48.8567
+            let long = 2.3508
+            let numDays = 5
+            let url = 'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=' + lati + ',' + long + '&days=' + numDays    //'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=48.8567,2.3508&days=5'
+            axios            
+            .get(url) //days 0 to 10
+            .then(response => { 
+                console.log(response.data.forecast.forecastday[0])//gives current day data
+                console.log(response.data.forecast.forecastday[0].day.avgtemp_c)
+                console.log(response.data.forecast.forecastday[0].day.condition.text)
+                console.log(response.data.forecast.forecastday[1])//gives tomorrows data
+                console.log(response.data.forecast.forecastday[1].day.avgtemp_c)
+                console.log(response.data.forecast.forecastday[1].day.condition.text)
+            })
+        }
     },
 
 })
