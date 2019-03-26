@@ -5,13 +5,35 @@ const app = new Vue({
         return {
             map: null,
             tileLayer: null,
-            layers: [],
+            popup: L.popup(),
+            locations: [{
+                    name: "Oslo",
+                    coordinate: [59.91, 10.75],
+                    marker: null
+                },
+                {
+                    name: "Stockholm",
+                    coordinate: [59.32, 18.07],
+                    marker: null
+                },
+                {
+                    name: "Cophenhagen",
+                    coordinate: [55.67, 12.57],
+                    marker: null
+                },
+                {
+                    name: "Bergen",
+                    coordinate: [60.4, 5.32],
+                    marker: null
+                }
+                
+            ]
         }
     },
 
     mounted() {
         this.initMap();
-        this.initLayers();      
+        this.markCoordinates();      
     },
 
     methods: {
@@ -29,8 +51,29 @@ const app = new Vue({
               );
 
             this.tileLayer.addTo(this.map);
-        },
-        initLayers() {},
-    },
+                        
 
+
+            this.map.on('click', this.onMapClick);
+
+
+
+        },
+        markCoordinates() {
+            // Make all markers on map
+            for (const location of this.locations) {
+                location.marker = L.marker(location.coordinate).addTo(this.map);
+                // Add a pop-up to each marker when clicked upon
+                location.marker.bindPopup("<b>Weather in " +  location.name + ":</b>").openPopup();
+                
+            }
+        },
+        onMapClick(e) {
+            console.log("Latitude: " + e.latlng.lat + ", Longitude: " + e.latlng.lng)
+            this.popup
+            .setLatLng(e.latlng)
+            .setContent("You clicked the map at " + e.latlng.toString())
+            .openOn(this.map);
+        }
+    },
 })
