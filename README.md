@@ -1,22 +1,29 @@
-# TODO
+# weather-app-vuetify
 
-Del 1: Kart og zoom 
+## Project setup
+```
+npm install
+```
 
-Del 2: Sette værdata på kartet
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
+### Compiles and minifies for production
+```
+npm run build
+```
 
-Ressurser:
-- leafletsjs.com
-- yr.no
+### Run your tests
+```
+npm run test
+```
 
+### Lints and fixes files
+```
+npm run lint
+```
 
-## Krav: 
-- Mobilversjon
-- Dropdown meny erstatter navbar på mobil
-- Bygg det som en NodeJS app
-- Optional: (Vuetify)
-
-
-## Husk
-- lever zip
-- kommenter, pass på variabelnavn og skriv pent!
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
