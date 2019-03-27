@@ -26,8 +26,12 @@
       <v-layout text-xs-center wrap>
         <v-flex mb-4>
           <!--Input - City Search-->
-          <input v-model="cityName" placeholder="Enter city of intrest" />
-          <button v-on:click="connectAPICityName">Enter</button>
+          <v-flex xs12 sm6 md3>
+            <v-text-field v-model="cityName" label="City" placeholder="Name"></v-text-field>
+            <v-btn v-on:click="connectAPICityName">Enter</v-btn>
+          </v-flex>
+          <!--<input v-model="cityName" placeholder="Enter city of intrest">
+          <button v-on:click="connectAPICityName">Enter</button>-->
         </v-flex>
 
         <!-- The Map -->
@@ -80,80 +84,84 @@
 </template>
 
 <script>
-  export default {
-    data: () => ({
-      drawer: null,
-      map: null,
-      tileLayer: null,
-      popup: global.L.popup(),
-      locations: [
-        {
-          name: "Oslo",
-          coordinate: [59.91, 10.75],
-          marker: null
-        },
-        {
-          name: "Stockholm",
-          coordinate: [59.32, 18.07],
-          marker: null
-        },
-        {
-          name: "Copenhagen",
-          coordinate: [55.67, 12.57],
-          marker: null
-        },
-        {
-          name: "Bergen",
-          coordinate: [60.4, 5.32],
-          marker: null
-        }
-      ],
-
-      layers: [],
-      weatherData: null,
-      currentLatitude: 59.91, //Oslo by default
-      currentLongitude: 10.75, //Oslo by default
-      currentLocationData: {
-        place: null,
-        temperatureNow: null,
-        weatherNow: null,
-        weatherIconNow: null
+export default {
+  data: () => ({
+    drawer: null,
+    map: null,
+    tileLayer: null,
+    popup: global.L.popup(),
+    locations: [
+      {
+        name: "Oslo",
+        coordinate: [59.91, 10.75],
+        marker: null
       },
-      cityName: "",
-      numDays: 10,
-      cityCoordinates: []
-    }),
+      {
+        name: "Stockholm",
+        coordinate: [59.32, 18.07],
+        marker: null
+      },
+      {
+        name: "Copenhagen",
+        coordinate: [55.67, 12.57],
+        marker: null
+      },
+      {
+        name: "London",
+        coordinate: [51.50722, -0.1275],
+        marker: null
+      }
+    ],
 
-    mounted() {
-      this.initMap();
-      this.initLayers();
-      this.connectForecastAPI();
+    layers: [],
+    weatherData: null,
+    currentLatitude: 59.91, //Oslo by default
+    currentLongitude: 10.75, //Oslo by default
+    currentLocationData: {
+      place: null,
+      temperatureNow: null,
+      weatherNow: null,
+      weatherIconNow: null,
+      weatherForecast1Day: null,
+      temperatureForecast1Day: null,
+      weatherIconForecast1Day: null
     },
+    cityName: "Oslo",
+    numDays: 10,
+    cityCoordinates: []
+  }),
 
-    methods: {
-      initMap() {
-        this.map = global.L.map("map").setView([59.91, 10.75], 5);
+  mounted() {
+    this.initMap();
+    this.initLayers();
+    this.connectForecastAPI();
+  },
 
-        this.tileLayer = global.L.tileLayer(
-          "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-          {
-            maxZoom: 18,
-            accessToken:
-              "pk.eyJ1IjoiYW5leGlzIiwiYSI6ImNqdHByOWs5dTA3MWozeWswbGI0dm1ucXIifQ.Jy0fvqCbGACxx4GdJMC09w",
-            id: "mapbox.streets",
-            attribution:
-              'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'
-          }
-        );
+  methods: {
+    initMap() {
+      this.map = global.L.map("map").setView([59.91, 10.75], 10);
 
-        this.tileLayer.addTo(this.map);
-        this.map.on("click", this.onMapClick);
-      },
+      this.tileLayer = global.L.tileLayer(
+        "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
+        {
+          maxZoom: 18,
+          accessToken:
+            "pk.eyJ1IjoiYW5leGlzIiwiYSI6ImNqdHByOWs5dTA3MWozeWswbGI0dm1ucXIifQ.Jy0fvqCbGACxx4GdJMC09w",
+          id: "mapbox.streets",
+          attribution:
+            'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'
+        }
+      );
 
+      this.tileLayer.addTo(this.map);
+      this.map.on("click", this.onMapClick);
+    },
+  
       async onMapClick(e) {
         this.currentLatitude = e.latlng.lat;
         this.currentLongitude = e.latlng.lng;
         await this.connectForecastAPI();
+
 
         // On map click, the popup is showing the following information:
         this.popup
@@ -250,20 +258,23 @@
 </script>
 
 <style>
-  html,
-  body {
-    width: 100%;
-    height: 100%;
-  }
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
 
-  .map {
-    max-height: 60vh;
-    max-width: 100%;
-    height: 100vh;
-    width: 100vh;
-    min-height: 300px;
 
-    background: #000;
+.map {
+  max-height: 40vh;
+  max-width: 100%;
+  height: 100vh;
+  width: 100vh;
+  min-height: 300px;
+  padding: 1px;
+  border: 1px solid #021a40;
+  z-index: 1;
+  background: #000;
   }
 
   .card {
@@ -273,4 +284,5 @@
     display: flex;
     overflow-x: auto;
   }
+
 </style>
