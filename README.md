@@ -11,5 +11,7 @@ A mobile weather app where you can get weather data by either
   - Search for a particular city
   - Access pre-defined loactions in the menu
   
-  
+## Run
+npm install
+npm run serve
   27.03.2019
