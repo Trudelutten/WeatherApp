@@ -1,66 +1,62 @@
-//const parseString = require('xml2js').parseString;
+<template>
+  <div>
+    <!--Inputfield to enter City of intrest-->
+    <input v-model="cityName" placeholder="Enter city of intrest">
+    <p>City is: {{ cityName }}</p>
+    <button v-on:click="connectAPICityName">Enter</button>
+    <h1>Map here:</h1>
+    <div id="map" class="map"></div>
+  </div>
+</template>
 
-const app = new Vue({
-  el: "#app",
 
-  data() {
-    return {
-      map: null,
-      tileLayer: null,
-      popup: L.popup((keepInView = true)),
-      locations: [
-        {
-          name: "Oslo",
-          coordinate: [59.91, 10.75],
-          marker: null
-        },
-        {
-          name: "Stockholm",
-          coordinate: [59.32, 18.07],
-          marker: null
-        },
-        {
-          name: "Cophenhagen",
-          coordinate: [55.67, 12.57],
-          marker: null
-        },
-        {
-          name: "Bergen",
-          coordinate: [60.4, 5.32],
-          marker: null
-        },
-        {
-          name: "Trondheim",
-          coordinate: [63.43, 10.39],
-          marker: null
-        } /*,
-        {
-          name: "Port Elizabeth",
-          coordinate: [-33.96, 25.6],
-          marker: null
-        }*/
-      ],
 
-      //cityList: [],
-
-      layers: [],
-      weatherData: null,
-      currentLatitude: 59.91, //Oslo by default
-      currentLongitude: 10.75, //Oslo by default
-      currentLocationData: {
-        place: null,
-        temperatureNow: null,
-        weatherNow: null,
-        weatherIconNow: null,
-        weatherForecast1Day: null,
-        temperatureForecast1Day: null,
-        weatherIconForecast1Day: null
+<script>
+export default {
+  data: () => ({
+    map: null,
+    tileLayer: null,
+    popup: L.popup(),
+    locations: [
+      {
+        name: "Oslo",
+        coordinate: [59.91, 10.75],
+        marker: null
       },
-      cityName: "",
-      numDays: 10,
-      cityCoordinates: []
-    };
-  },
+      {
+        name: "Stockholm",
+        coordinate: [59.32, 18.07],
+        marker: null
+      },
+      {
+        name: "Cophenhagen",
+        coordinate: [55.67, 12.57],
+        marker: null
+      },
+      {
+        name: "Bergen",
+        coordinate: [60.4, 5.32],
+        marker: null
+      }
+    ],
+
+    layers: [],
+    weatherData: null,
+    currentLatitude: 59.91, //Oslo by default
+    currentLongitude: 10.75, //Oslo by default
+    currentLocationData: {
+      place: null,
+      temperatureNow: null,
+      weatherNow: null,
+      weatherIconNow: null,
+      weatherForecast1Day: null,
+      temperatureForecast1Day: null,
+      weatherIconForecast1Day: null
+    },
+    cityName: "",
+    numDays: 10,
+    cityCoordinates: []
+  }),
 
   mounted() {
     this.initMap();
@@ -105,10 +101,8 @@ const app = new Vue({
       await this.connectForecastAPI();
 
       console.log("Latitude: " + e.latlng.lat + ", Longitude: " + e.latlng.lng);
-      console.log("e: " + e.latlng);
 
       // On map click, the popup is showing the following information:
-      //this.map.setView([e.latlng.lat, e.latlng.lng], 5);
 
       this.popup
         .setLatLng(e.latlng)
@@ -153,7 +147,7 @@ const app = new Vue({
             response.data.forecast.forecastday[0].day.condition.text;
           this.currentLocationData.weatherIconNow =
             response.data.forecast.forecastday[0].day.condition.icon;
-          // Storing tomorrows weather data:
+          // storing tomorrows weather data:
           this.currentLocationData.temperatureForecast1Day =
             response.data.forecast.forecastday[1].day.avgtemp_c;
           this.currentLocationData.weatherForecast1Day =
@@ -161,7 +155,7 @@ const app = new Vue({
           this.currentLocationData.weatherIconForecast1Day =
             response.data.forecast.forecastday[1].day.condition.icon;
 
-          /*console.log(response.data.forecast.forecastday[0]); //gives current day data
+          console.log(response.data.forecast.forecastday[0]); //gives current day data
           console.log(response.data.forecast.forecastday[0].day.avgtemp_c);
           console.log(response.data.forecast.forecastday[0].day.condition.text);
           console.log(response.data.forecast.forecastday[0].day.condition.icon);
@@ -169,7 +163,7 @@ const app = new Vue({
           console.log(response.data.forecast.forecastday[1]); //gives tomorrows data
           console.log(response.data.forecast.forecastday[1].day.avgtemp_c);
           console.log(response.data.forecast.forecastday[1].day.condition.text);
-          console.log(response.data.forecast.forecastday[1].day.condition.icon); */
+          console.log(response.data.forecast.forecastday[1].day.condition.icon);
         });
     },
     async connectAPICityName() {
@@ -229,4 +223,14 @@ const app = new Vue({
         .openOn(this.map);
     }
   }
-});
+};
+</script>
+
+<style>
+.map {
+  height: 600px;
+  width: 800px;
+  max-height: 80%;
+  max-width: 80%;
+}
+</style>
