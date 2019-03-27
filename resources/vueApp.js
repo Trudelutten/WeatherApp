@@ -30,19 +30,19 @@ const app = new Vue({
                     marker: null
                 }
                 
-            ]
+            ],
 
             layers: [],
             weatherData: null,
+            currentLatitude: 59.91,   //Oslo by default
+            currentLongitude: 10.75,  //Oslo by default
 
         }
     },
 
     mounted() {
         this.initMap();
-
-        this.markCoordinates();      
-
+        this.markCoordinates();  
         this.initLayers();     
         this.connectForecastAPI(); 
     },
@@ -61,14 +61,8 @@ const app = new Vue({
                 }
               );
 
-            this.tileLayer.addTo(this.map);
-                        
-
-
+            this.tileLayer.addTo(this.map);                    
             this.map.on('click', this.onMapClick);
-
-
-
         },
 
         markCoordinates() {
@@ -86,24 +80,28 @@ const app = new Vue({
             .setLatLng(e.latlng)
             .setContent("You clicked the map at " + e.latlng.toString())
             .openOn(this.map);
+            this.currentLatitude = e.latlng.lat
+            this.currentLongitude = e.latlng.lng
 
-        
+        },
         initLayers() {},
          
         connectForecastAPI() {
-            let lati = 48.8567
-            let long = 2.3508
+            //let lati = 48.8567
+            //let long = 2.3508
             let numDays = 5
-            let url = 'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=' + lati + ',' + long + '&days=' + numDays    //'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=48.8567,2.3508&days=5'
+            let url = 'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=' + this.currentLatitude + ',' + this.currentLongitude + '&days=' + numDays    //'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=48.8567,2.3508&days=5'
             axios            
             .get(url) //days 0 to 10
             .then(response => { 
                 console.log(response.data.forecast.forecastday[0])//gives current day data
                 console.log(response.data.forecast.forecastday[0].day.avgtemp_c)
                 console.log(response.data.forecast.forecastday[0].day.condition.text)
+                console.log(response.data.forecast.forecastday[0].day.condition.icon)
                 console.log(response.data.forecast.forecastday[1])//gives tomorrows data
                 console.log(response.data.forecast.forecastday[1].day.avgtemp_c)
                 console.log(response.data.forecast.forecastday[1].day.condition.text)
+                console.log(response.data.forecast.forecastday[1].day.condition.icon)
             })
 
         }
