@@ -1,6 +1,9 @@
-.map { 
-    height: 600px; 
-    width: 800px;
-    max-height: 80%;
-    max-width: 80%;
+.map {
+  height: 500px;
+  width: 800px;
+  max-height: 80%;
+  max-width: 80%;
+}
+.button {
+  size: 20px;
 }
