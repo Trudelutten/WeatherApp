@@ -41,94 +41,44 @@
           </v-layout>
         </v-flex>
 
-        <!-- The Info Cards 
-        NOT DONE-->
+        <!-- The Info Cards-->
       </v-layout>
-      <!--Name of location-->
-      <v-card>
-        <v-card-title>
-          {{
-          this.weatherData && this.weatherData.location.name
-          }}
-        </v-card-title>
+      <v-card
+        ><v-card-title>
+          <!--Name of location-->
+
+          <b style="font-size: 16px">{{
+            this.weatherData && this.weatherData.location.name
+          }}</b></v-card-title
+        >
       </v-card>
       <!--Display forcast data in Cards-->
-      <v-card>
-        <v-card-title>
-          {{
-          this.weatherData && this.weatherData.forecast.forecastday[0].date
-          }}
-        </v-card-title>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[0].day.avgtemp_c
-          }}
-        </v-card-text>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[0].day.condition.text
-          }}
-        </v-card-text>
-      </v-card>
-      <v-card>
-        <v-card-title>
-          {{
-          this.weatherData && this.weatherData.forecast.forecastday[1].date
-          }}
-        </v-card-title>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[1].day.avgtemp_c
-          }}
-        </v-card-text>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[1].day.condition.text
-          }}
-        </v-card-text>
-      </v-card>
-      <v-card>
-        <v-card-title>
-          {{
-          this.weatherData && this.weatherData.forecast.forecastday[2].date
-          }}
-        </v-card-title>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[2].day.avgtemp_c
-          }}
-        </v-card-text>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[2].day.condition.text
-          }}
-        </v-card-text>
-      </v-card>
-      <v-card>
-        <v-card-title>
-          {{
-          this.weatherData && this.weatherData.forecast.forecastday[3].date
-          }}
-        </v-card-title>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[3].day.avgtemp_c
-          }}
-        </v-card-text>
-        <v-card-text>
-          {{
-          this.weatherData &&
-          this.weatherData.forecast.forecastday[3].day.condition.text
-          }}
-        </v-card-text>
-      </v-card>
+      <div v-if="this.weatherData">
+        <v-list
+          dense
+          v-for="forecastday in this.weatherData.forecast.forecastday"
+          :key="forecastday.date"
+        >
+          <v-card>
+            <v-card-title>
+              <b>Date: </b>
+              <v-card-text v-text="   forecastday.date"> </v-card-text>
+            </v-card-title>
+            <v-card-title>
+              <b>Temprature in Celsius</b>
+              <v-card-text v-text="forecastday.day.avgtemp_c"> </v-card-text>
+            </v-card-title>
+            <v-card-title>
+              <b>Weather condition</b>
+              <v-card-text v-text="forecastday.day.condition.text">
+              </v-card-text>
+            </v-card-title>
+            <img
+              v-bind:src="weatherData &&weatherData.forecast.forecastday[0].day.condition.icon"
+            />
+          </v-card>
+        </v-list>
+      </div>
     </v-container>
   </v-app>
 </template>
@@ -206,181 +156,105 @@ export default {
       this.tileLayer.addTo(this.map);
       this.map.on("click", this.onMapClick);
     },
-    /*markCoordinates() {
-      // Make all markers on map
-      for (const location of this.locations) {
-        location.marker = global.L.marker(location.coordinate).addTo(this.map);
-        // Add a pop-up to each marker when clicked upon
-        location.marker
-          .bindPopup("<b>Weather in " + location.name + ":</b>")
-          .openPopup();
+  
+      async onMapClick(e) {
+        this.currentLatitude = e.latlng.lat;
+        this.currentLongitude = e.latlng.lng;
+        await this.connectForecastAPI();
+
+
+        // On map click, the popup is showing the following information:
+        this.popup
+          .setLatLng(e.latlng)
+          .setContent(
+            "Nearest place of interest: <b>" +
+              this.currentLocationData.place +
+              "</b><br>Temperature today: " +
+              this.currentLocationData.temperatureNow +
+              " &degC <br>" +
+              this.currentLocationData.weatherNow +
+              "<br> <img src=" +
+              this.currentLocationData.weatherIconNow +
+              ">"
+          )
+          .openOn(this.map);
+      },
+      initLayers() {},
+
+      async connectForecastAPI() {
+        let url =
+          "http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=" +
+          this.currentLatitude +
+          "," +
+          this.currentLongitude +
+          "&days=" +
+          this.numDays; //'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=48.8567,2.3508&days=5'
+        await global.axios
+          .get(url) //days 0 to 10
+          .then(response => {
+            //To store all the forcast data
+            this.weatherData = response.data;
+
+            this.currentLocationData.place = response.data.location.name;
+            // Storing current weather data:
+            this.currentLocationData.temperatureNow =
+              response.data.forecast.forecastday[0].day.avgtemp_c;
+            this.currentLocationData.weatherNow =
+              response.data.forecast.forecastday[0].day.condition.text;
+            this.currentLocationData.weatherIconNow =
+              response.data.forecast.forecastday[0].day.condition.icon;
+          });
+      },
+      async connectAPICityName() {
+        this.cityName = this.cityName.toLowerCase().replace(/ /g, "_");
+        let url =
+          "http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=" +
+          this.cityName +
+          "&days=" +
+          this.numDays;
+        await global.axios
+          .get(url) //days 0 to 10
+          .then(response => {
+            //To store all the forcast data
+            this.weatherData = response.data;
+
+            this.currentLocationData.place = response.data.location.name;
+            // Storing current weather data:
+            this.currentLocationData.temperatureNow =
+              response.data.forecast.forecastday[0].day.avgtemp_c;
+            this.currentLocationData.weatherNow =
+              response.data.forecast.forecastday[0].day.condition.text;
+            this.currentLocationData.weatherIconNow =
+              response.data.forecast.forecastday[0].day.condition.icon;
+
+            //Clear city coordinates for new request
+            this.cityCoordinates = [];
+            //Set coordinates for popup
+            this.cityCoordinates.push(response.data.location.lat);
+            this.cityCoordinates.push(response.data.location.lon);
+          });
+
+        this.popup
+          .setLatLng(this.cityCoordinates)
+          .setContent(
+            "Nearest place of interest: <b>" +
+              this.currentLocationData.place +
+              "</b><br>Temperature today: " +
+              this.currentLocationData.temperatureNow +
+              " &degC <br>" +
+              this.currentLocationData.weatherNow +
+              "<br> <img src=" +
+              this.currentLocationData.weatherIconNow +
+              ">"
+          )
+          .openOn(this.map);
+      },
+      goToCity(cityName) {
+        this.cityName = cityName;
+        this.connectAPICityName();
       }
-    },*/
-    async onMapClick(e) {
-      this.currentLatitude = e.latlng.lat;
-      this.currentLongitude = e.latlng.lng;
-      await this.connectForecastAPI();
-
-      console.log("Latitude: " + e.latlng.lat + ", Longitude: " + e.latlng.lng);
-
-      // On map click, the popup is showing the following information:
-
-      this.popup
-        .setLatLng(e.latlng)
-        .setContent(
-          "Nearest place of interest: <b>" +
-            this.currentLocationData.place +
-            "</b><br>Temperature today: " +
-            this.currentLocationData.temperatureNow +
-            " &degC <br>" +
-            this.currentLocationData.weatherNow +
-            "<br> <img src=" +
-            this.currentLocationData.weatherIconNow +
-            ">" +
-            "</b><br>Temperature tomorrow: " +
-            this.currentLocationData.temperatureForecast1Day +
-            " &degC <br>" +
-            this.currentLocationData.weatherForecast1Day +
-            "<br> <img src=" +
-            this.currentLocationData.weatherIconForecast1Day +
-            ">"
-        )
-        .openOn(this.map);
-    },
-    initLayers() {},
-
-    async connectForecastAPI() {
-      let url =
-        "http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=" +
-        this.currentLatitude +
-        "," +
-        this.currentLongitude +
-        "&days=" +
-        this.numDays; //'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=48.8567,2.3508&days=5'
-      await global.axios
-        .get(url) //days 0 to 10
-        .then(response => {
-          //To store all the forcast data
-          this.weatherData = response.data;
-          console.log(response.data.forecast.forecastday[0].day.condition.icon);
-
-          this.currentLocationData.place = response.data.location.name;
-          // Storing current weather data:
-          this.currentLocationData.temperatureNow =
-            response.data.forecast.forecastday[0].day.avgtemp_c;
-          this.currentLocationData.weatherNow =
-            response.data.forecast.forecastday[0].day.condition.text;
-          this.currentLocationData.weatherIconNow =
-            response.data.forecast.forecastday[0].day.condition.icon;
-          // storing tomorrows weather data:
-          this.currentLocationData.temperatureForecast1Day =
-            response.data.forecast.forecastday[1].day.avgtemp_c;
-          this.currentLocationData.weatherForecast1Day =
-            response.data.forecast.forecastday[1].day.condition.text;
-          this.currentLocationData.weatherIconForecast1Day =
-            response.data.forecast.forecastday[1].day.condition.icon;
-          /*
-            console.log(response.data.forecast.forecastday[0]); //gives current day data
-            console.log(response.data.forecast.forecastday[0].day.avgtemp_c);
-            console.log(
-              response.data.forecast.forecastday[0].day.condition.text
-            );
-            console.log(
-              response.data.forecast.forecastday[0].day.condition.icon
-            );
-            console.log(response.data.location.name);
-            console.log(response.data.forecast.forecastday[1]); //gives tomorrows data
-            console.log(response.data.forecast.forecastday[1].day.avgtemp_c);
-            console.log(
-              response.data.forecast.forecastday[1].day.condition.text
-            );
-            console.log(
-              response.data.forecast.forecastday[1].day.condition.icon
-            );*/
-        });
-      //this.printForecast();
-    },
-    async connectAPICityName() {
-      this.cityName = this.cityName.toLowerCase().replace(/ /g, "_");
-      let url =
-        "http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=" +
-        this.cityName +
-        "&days=" +
-        this.numDays;
-      await global.axios
-        .get(url) //days 0 to 10
-        .then(response => {
-          //To store all the forcast data
-          this.weatherData = response.data;
-
-          this.currentLocationData.place = response.data.location.name;
-          // Storing current weather data:
-          this.currentLocationData.temperatureNow =
-            response.data.forecast.forecastday[0].day.avgtemp_c;
-          this.currentLocationData.weatherNow =
-            response.data.forecast.forecastday[0].day.condition.text;
-          this.currentLocationData.weatherIconNow =
-            response.data.forecast.forecastday[0].day.condition.icon;
-          // Storing tomorrows weather data:
-          this.currentLocationData.temperatureForecast1Day =
-            response.data.forecast.forecastday[1].day.avgtemp_c;
-          this.currentLocationData.weatherForecast1Day =
-            response.data.forecast.forecastday[1].day.condition.text;
-          this.currentLocationData.weatherIconForecast1Day =
-            response.data.forecast.forecastday[1].day.condition.icon;
-
-          //Clear city coordinates for new request
-          this.cityCoordinates = [];
-          //Set coordinates for popup
-          this.cityCoordinates.push(response.data.location.lat);
-          this.cityCoordinates.push(response.data.location.lon);
-        });
-
-      this.popup
-        .setLatLng(this.cityCoordinates)
-        .setContent(
-          "Nearest place of interest: <b>" +
-            this.currentLocationData.place +
-            "</b><br>Temperature today: " +
-            this.currentLocationData.temperatureNow +
-            " &degC <br>" +
-            this.currentLocationData.weatherNow +
-            "<br> <img src=" +
-            this.currentLocationData.weatherIconNow +
-            ">" +
-            "</b><br>Temperature tomorrow: " +
-            this.currentLocationData.temperatureForecast1Day +
-            " &degC <br>" +
-            this.currentLocationData.weatherForecast1Day +
-            "<br> <img src=" +
-            this.currentLocationData.weatherIconForecast1Day +
-            ">"
-        )
-        .openOn(this.map);
-      //this.printForecast();
-    },
-    goToCity(cityName) {
-      this.cityName = cityName;
-      this.connectAPICityName();
     }
-    /*
-    printForecast() {
-      let i = 0;
-
-      while (i < 6) {
-        console.log("Date:" + this.weatherData.forecast.forecastday[i].date);
-        console.log(
-          "Temp: " + this.weatherData.forecast.forecastday[i].day.avgtemp_c
-        );
-        console.log(
-          "Condition: " +
-            this.weatherData.forecast.forecastday[i].day.condition.text
-        );
-        i++;
-      }
-    }*/
-  }
-};
+  };
 </script>
 
 <style>
@@ -389,6 +263,7 @@ body {
   width: 100%;
   height: 100%;
 }
+
 
 .map {
   max-height: 40vh;
@@ -399,15 +274,15 @@ body {
   padding: 1px;
   border: 1px solid #021a40;
   z-index: 1;
-
   background: #000;
-}
+  }
 
-.card {
-  background-color: #fff;
-  min-width: 100%;
-  min-height: 200px;
-  display: flex;
-  overflow-x: auto;
-}
+  .card {
+    background-color: #fff;
+    min-width: 100%;
+    min-height: 200px;
+    display: flex;
+    overflow-x: auto;
+  }
+
 </style>
