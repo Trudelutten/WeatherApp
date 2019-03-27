@@ -1,12 +1,55 @@
 <template>
-  <div>
-    <!--Inputfield to enter City of intrest-->
-    <input v-model="cityName" placeholder="Enter city of intrest">
-    <p>City is: {{ cityName }}</p>
-    <button v-on:click="connectAPICityName">Enter</button>
-    <h1>Map here:</h1>
-    <div id="map" class="map"></div>
-  </div>
+  <v-app>
+    <!-- Navigation Drawer -->
+    <v-navigation-drawer fixed v-model="drawer" app>
+      <v-list dense>
+        <v-list-tile @click>
+          <v-list-tile-action>
+            <v-icon>home</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Home</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile @click>
+          <v-list-tile-action>
+            <v-icon>contact_mail</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Contact</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+
+    <!-- NavBar -->
+    <v-toolbar color="indigo" dark fixed app>
+      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+      <v-toolbar-title>Weather App</v-toolbar-title>
+    </v-toolbar>
+
+    <!-- Body -->
+    <v-container>
+      <v-layout text-xs-center wrap>
+        <v-flex mb-4>
+          <!--Input - City Search-->
+          <input v-model="cityName" placeholder="Enter city of intrest">
+          <p>City is: {{ cityName }}</p>
+          <button v-on:click="connectAPICityName">Enter</button>
+        </v-flex>
+
+        <!-- The Map -->
+        <v-flex mb-5 xs12>
+          <v-layout justify-center>
+            <div id="map" class="map"></div>
+          </v-layout>
+        </v-flex>
+
+        <!-- The Info Cards 
+        NOT DONE-->
+      </v-layout>
+    </v-container>
+  </v-app>
 </template>
 
 
@@ -14,6 +57,8 @@
 <script>
 export default {
   data: () => ({
+    drawer: null,
+
     map: null,
     tileLayer: null,
     popup: L.popup(),
@@ -227,10 +272,16 @@ export default {
 </script>
 
 <style>
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
 .map {
-  height: 600px;
-  width: 800px;
-  max-height: 80%;
-  max-width: 80%;
+  height: 50vh;
+  width: 80vh;
+  min-height: 300px;
+  background: #000;
 }
 </style>
