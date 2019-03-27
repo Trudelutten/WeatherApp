@@ -26,8 +26,12 @@
       <v-layout text-xs-center wrap>
         <v-flex mb-4>
           <!--Input - City Search-->
-          <input v-model="cityName" placeholder="Enter city of intrest" />
-          <button v-on:click="connectAPICityName">Enter</button>
+          <v-flex xs12 sm6 md3>
+            <v-text-field v-model="cityName" label="City" placeholder="Name"></v-text-field>
+            <v-btn v-on:click="connectAPICityName">Enter</v-btn>
+          </v-flex>
+          <!--<input v-model="cityName" placeholder="Enter city of intrest">
+          <button v-on:click="connectAPICityName">Enter</button>-->
         </v-flex>
 
         <!-- The Map -->
@@ -41,63 +45,89 @@
         NOT DONE-->
       </v-layout>
       <!--Name of location-->
-      <v-card
-        ><v-card-title>{{
+      <v-card>
+        <v-card-title>
+          {{
           this.weatherData && this.weatherData.location.name
-        }}</v-card-title>
+          }}
+        </v-card-title>
       </v-card>
       <!--Display forcast data in Cards-->
       <v-card>
-        <v-card-title>{{
+        <v-card-title>
+          {{
           this.weatherData && this.weatherData.forecast.forecastday[0].date
-        }}</v-card-title>
-        <v-card-text>{{
+          }}
+        </v-card-title>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[0].day.avgtemp_c
-        }}</v-card-text>
-        <v-card-text>{{
+          this.weatherData.forecast.forecastday[0].day.avgtemp_c
+          }}
+        </v-card-text>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[0].day.condition.text
-        }}</v-card-text>
+          this.weatherData.forecast.forecastday[0].day.condition.text
+          }}
+        </v-card-text>
       </v-card>
       <v-card>
-        <v-card-title>{{
+        <v-card-title>
+          {{
           this.weatherData && this.weatherData.forecast.forecastday[1].date
-        }}</v-card-title>
-        <v-card-text>{{
+          }}
+        </v-card-title>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[1].day.avgtemp_c
-        }}</v-card-text>
-        <v-card-text>{{
+          this.weatherData.forecast.forecastday[1].day.avgtemp_c
+          }}
+        </v-card-text>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[1].day.condition.text
-        }}</v-card-text>
+          this.weatherData.forecast.forecastday[1].day.condition.text
+          }}
+        </v-card-text>
       </v-card>
       <v-card>
-        <v-card-title>{{
+        <v-card-title>
+          {{
           this.weatherData && this.weatherData.forecast.forecastday[2].date
-        }}</v-card-title>
-        <v-card-text>{{
+          }}
+        </v-card-title>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[2].day.avgtemp_c
-        }}</v-card-text>
-        <v-card-text>{{
+          this.weatherData.forecast.forecastday[2].day.avgtemp_c
+          }}
+        </v-card-text>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[2].day.condition.text
-        }}</v-card-text>
+          this.weatherData.forecast.forecastday[2].day.condition.text
+          }}
+        </v-card-text>
       </v-card>
       <v-card>
-        <v-card-title>{{
+        <v-card-title>
+          {{
           this.weatherData && this.weatherData.forecast.forecastday[3].date
-        }}</v-card-title>
-        <v-card-text>{{
+          }}
+        </v-card-title>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[3].day.avgtemp_c
-        }}</v-card-text>
-        <v-card-text>{{
+          this.weatherData.forecast.forecastday[3].day.avgtemp_c
+          }}
+        </v-card-text>
+        <v-card-text>
+          {{
           this.weatherData &&
-            this.weatherData.forecast.forecastday[3].day.condition.text
-        }}</v-card-text>
+          this.weatherData.forecast.forecastday[3].day.condition.text
+          }}
+        </v-card-text>
       </v-card>
     </v-container>
   </v-app>
@@ -127,8 +157,8 @@ export default {
         marker: null
       },
       {
-        name: "Bergen",
-        coordinate: [60.4, 5.32],
+        name: "London",
+        coordinate: [51.50722, -0.1275],
         marker: null
       }
     ],
@@ -146,21 +176,20 @@ export default {
       temperatureForecast1Day: null,
       weatherIconForecast1Day: null
     },
-    cityName: "",
+    cityName: "Oslo",
     numDays: 10,
     cityCoordinates: []
   }),
 
   mounted() {
     this.initMap();
-    this.markCoordinates();
     this.initLayers();
     this.connectForecastAPI();
   },
 
   methods: {
     initMap() {
-      this.map = global.L.map("map").setView([59.91, 10.75], 5);
+      this.map = global.L.map("map").setView([59.91, 10.75], 10);
 
       this.tileLayer = global.L.tileLayer(
         "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
@@ -233,6 +262,7 @@ export default {
         .then(response => {
           //To store all the forcast data
           this.weatherData = response.data;
+          console.log(response.data.forecast.forecastday[0].day.condition.icon);
 
           this.currentLocationData.place = response.data.location.name;
           // Storing current weather data:
@@ -354,29 +384,30 @@ export default {
 </script>
 
 <style>
-  html,
-  body {
-    width: 100%;
-    height: 100%;
-  }
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
 
 .map {
-  max-height: 60vh;
+  max-height: 40vh;
   max-width: 100%;
   height: 100vh;
   width: 100vh;
   min-height: 300px;
+  padding: 1px;
+  border: 1px solid #021a40;
+  z-index: 1;
 
   background: #000;
 }
 
-  .card {
-    background-color: #fff;
-    min-width: 100%;
-    min-height: 200px;
-    display: flex;
-    overflow-x: auto;
-  }
-
-
+.card {
+  background-color: #fff;
+  min-width: 100%;
+  min-height: 200px;
+  display: flex;
+  overflow-x: auto;
+}
 </style>
