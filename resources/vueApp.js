@@ -28,8 +28,20 @@ const app = new Vue({
           name: "Bergen",
           coordinate: [60.4, 5.32],
           marker: null
-        }
+        },
+        {
+          name: "Trondheim",
+          coordinate: [63.43, 10.39],
+          marker: null
+        } /*,
+        {
+          name: "Port Elizabeth",
+          coordinate: [-33.96, 25.6],
+          marker: null
+        }*/
       ],
+
+      //cityList: [],
 
       layers: [],
       weatherData: null,
@@ -43,7 +55,10 @@ const app = new Vue({
         weatherForecast1Day: null,
         temperatureForecast1Day: null,
         weatherIconForecast1Day: null
-      }
+      },
+      cityName: "",
+      numDays: 10,
+      cityCoordinates: []
     };
   },
 
@@ -90,6 +105,7 @@ const app = new Vue({
       await this.connectForecastAPI();
 
       console.log("Latitude: " + e.latlng.lat + ", Longitude: " + e.latlng.lng);
+      console.log("e: " + e.latlng);
 
       // On map click, the popup is showing the following information:
       //this.map.setView([e.latlng.lat, e.latlng.lng], 5);
@@ -119,16 +135,13 @@ const app = new Vue({
     initLayers() {},
 
     async connectForecastAPI() {
-      //let lati = 48.8567
-      //let long = 2.3508
-      let numDays = 5;
       let url =
         "http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=" +
         this.currentLatitude +
         "," +
         this.currentLongitude +
         "&days=" +
-        numDays; //'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=48.8567,2.3508&days=5'
+        this.numDays; //'http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=48.8567,2.3508&days=5'
       await axios
         .get(url) //days 0 to 10
         .then(response => {
@@ -140,7 +153,7 @@ const app = new Vue({
             response.data.forecast.forecastday[0].day.condition.text;
           this.currentLocationData.weatherIconNow =
             response.data.forecast.forecastday[0].day.condition.icon;
-          // storing tomorrows weather data:
+          // Storing tomorrows weather data:
           this.currentLocationData.temperatureForecast1Day =
             response.data.forecast.forecastday[1].day.avgtemp_c;
           this.currentLocationData.weatherForecast1Day =
@@ -148,7 +161,7 @@ const app = new Vue({
           this.currentLocationData.weatherIconForecast1Day =
             response.data.forecast.forecastday[1].day.condition.icon;
 
-          console.log(response.data.forecast.forecastday[0]); //gives current day data
+          /*console.log(response.data.forecast.forecastday[0]); //gives current day data
           console.log(response.data.forecast.forecastday[0].day.avgtemp_c);
           console.log(response.data.forecast.forecastday[0].day.condition.text);
           console.log(response.data.forecast.forecastday[0].day.condition.icon);
@@ -156,8 +169,64 @@ const app = new Vue({
           console.log(response.data.forecast.forecastday[1]); //gives tomorrows data
           console.log(response.data.forecast.forecastday[1].day.avgtemp_c);
           console.log(response.data.forecast.forecastday[1].day.condition.text);
-          console.log(response.data.forecast.forecastday[1].day.condition.icon);
+          console.log(response.data.forecast.forecastday[1].day.condition.icon); */
         });
+    },
+    async connectAPICityName() {
+      this.cityName = this.cityName.toLowerCase().replace(/ /g, "_");
+      let url =
+        "http://api.apixu.com/v1/forecast.json?key=de6ba3e8d6da421881c132607192603&q=" +
+        this.cityName +
+        "&days=" +
+        this.numDays;
+      console.log(url);
+      await axios
+        .get(url) //days 0 to 10
+        .then(response => {
+          this.currentLocationData.place = response.data.location.name;
+          // Storing current weather data:
+          this.currentLocationData.temperatureNow =
+            response.data.forecast.forecastday[0].day.avgtemp_c;
+          this.currentLocationData.weatherNow =
+            response.data.forecast.forecastday[0].day.condition.text;
+          this.currentLocationData.weatherIconNow =
+            response.data.forecast.forecastday[0].day.condition.icon;
+          // Storing tomorrows weather data:
+          this.currentLocationData.temperatureForecast1Day =
+            response.data.forecast.forecastday[1].day.avgtemp_c;
+          this.currentLocationData.weatherForecast1Day =
+            response.data.forecast.forecastday[1].day.condition.text;
+          this.currentLocationData.weatherIconForecast1Day =
+            response.data.forecast.forecastday[1].day.condition.icon;
+
+          //Clear city coordinates for new request
+          this.cityCoordinates = [];
+          //Set coordinates for popup
+          this.cityCoordinates.push(response.data.location.lat);
+          this.cityCoordinates.push(response.data.location.lon);
+        });
+      console.log("popup coord: " + this.cityCoordinates);
+      this.popup
+        .setLatLng(this.cityCoordinates)
+        .setContent(
+          "Nearest place of interest: <b>" +
+            this.currentLocationData.place +
+            "</b><br>Temperature today: " +
+            this.currentLocationData.temperatureNow +
+            " &degC <br>" +
+            this.currentLocationData.weatherNow +
+            "<br> <img src=" +
+            this.currentLocationData.weatherIconNow +
+            ">" +
+            "</b><br>Temperature tomorrow: " +
+            this.currentLocationData.temperatureForecast1Day +
+            " &degC <br>" +
+            this.currentLocationData.weatherForecast1Day +
+            "<br> <img src=" +
+            this.currentLocationData.weatherIconForecast1Day +
+            ">"
+        )
+        .openOn(this.map);
     }
   }
 });
