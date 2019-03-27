@@ -33,7 +33,7 @@
       <v-layout text-xs-center wrap>
         <v-flex mb-4>
           <!--Input - City Search-->
-          <input v-model="cityName" placeholder="Enter city of intrest">
+          <input v-model="cityName" placeholder="Enter city of intrest" />
           <button v-on:click="connectAPICityName">Enter</button>
         </v-flex>
 
@@ -47,6 +47,65 @@
         <!-- The Info Cards 
         NOT DONE-->
       </v-layout>
+      <!--Name of location-->
+      <v-card
+        ><v-card-title>{{
+          this.weatherData && this.weatherData.location.name
+        }}</v-card-title>
+      </v-card>
+      <!--Display forcast data in Cards-->
+      <v-card>
+        <v-card-title>{{
+          this.weatherData && this.weatherData.forecast.forecastday[0].date
+        }}</v-card-title>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[0].day.avgtemp_c
+        }}</v-card-text>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[0].day.condition.text
+        }}</v-card-text>
+      </v-card>
+      <v-card>
+        <v-card-title>{{
+          this.weatherData && this.weatherData.forecast.forecastday[1].date
+        }}</v-card-title>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[1].day.avgtemp_c
+        }}</v-card-text>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[1].day.condition.text
+        }}</v-card-text>
+      </v-card>
+      <v-card>
+        <v-card-title>{{
+          this.weatherData && this.weatherData.forecast.forecastday[2].date
+        }}</v-card-title>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[2].day.avgtemp_c
+        }}</v-card-text>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[2].day.condition.text
+        }}</v-card-text>
+      </v-card>
+      <v-card>
+        <v-card-title>{{
+          this.weatherData && this.weatherData.forecast.forecastday[3].date
+        }}</v-card-title>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[3].day.avgtemp_c
+        }}</v-card-text>
+        <v-card-text>{{
+          this.weatherData &&
+            this.weatherData.forecast.forecastday[3].day.condition.text
+        }}</v-card-text>
+      </v-card>
     </v-container>
   </v-app>
 </template>
@@ -99,7 +158,6 @@
       cityCoordinates: []
     }),
 
-
     mounted() {
       this.initMap();
       this.markCoordinates();
@@ -125,7 +183,6 @@
 
         this.tileLayer.addTo(this.map);
         this.map.on("click", this.onMapClick);
-
       },
 
       markCoordinates() {
@@ -303,17 +360,24 @@
 </script>
 
 <style>
-html,
-body {
-  width: 100%;
-  height: 100%;
-}
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+  }
 
-.map {
-  height: 50vh;
-  width: 80vh;
-  min-height: 300px;
-  background: #000;
-}
+  .card {
+    background-color: #fff;
+    min-width: 100%;
+    min-height: 200px;
+    display: flex;
+    overflow-x: auto;
+  }
 
+  .map {
+    height: 50vh;
+    width: 80vh;
+    min-height: 300px;
+    background: #000;
+  }
 </style>
